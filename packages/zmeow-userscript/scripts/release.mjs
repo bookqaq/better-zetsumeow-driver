@@ -75,7 +75,7 @@ const DEFAULT_UPDATE_BASE_URL =
 const DEFAULT_GITHUB_API_URL = 'https://api.github.com';
 const DEFAULT_GITHUB_UPLOAD_URL = 'https://uploads.github.com';
 const DEFAULT_GITHUB_OWNER = 'bookqaq';
-const DEFAULT_GITHUB_REPO = 'zmeow-tools';
+const DEFAULT_GITHUB_REPO = 'better-zetsumeow-driver';
 const DEFAULT_NPM_REGISTRY = 'https://registry.npmjs.org/';
 // npm publish may stop for a browser-based 2FA challenge (or a classic OTP
 // prompt) and poll until the account owner finishes it. That is interactive by
@@ -281,7 +281,7 @@ function printUsage() {
       '  --github-api-url <u>    GitHub API base (default: https://api.github.com)',
       '  --github-upload-url <u> GitHub upload base (default: https://uploads.github.com)',
       '  --github-owner <owner>  GitHub owner (default: bookqaq)',
-      '  --github-repo <repo>    GitHub repo (default: zmeow-tools)',
+      '  --github-repo <repo>    GitHub repo (default: better-zetsumeow-driver)',
       '  --skip-check            Skip `pnpm check` (local debugging only)',
       '  --allow-dirty           Allow an unclean git tree (local debugging only)',
       '  -h, --help              Show this help',

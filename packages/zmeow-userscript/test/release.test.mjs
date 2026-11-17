@@ -168,19 +168,19 @@ test('--publish uploads npm and GitHub release assets', async () => {
       response.end('{}');
       return;
     }
-    if (request.method === 'POST' && url.pathname === '/api/repos/bookqaq/zmeow-tools/releases') {
+    if (request.method === 'POST' && url.pathname === '/api/repos/bookqaq/better-zetsumeow-driver/releases') {
       response.statusCode = 201;
       response.end(
         JSON.stringify({
           id: 101,
-          html_url: `https://github.com/bookqaq/zmeow-tools/releases/tag/userscript-v${version}`,
+          html_url: `https://github.com/bookqaq/better-zetsumeow-driver/releases/tag/userscript-v${version}`,
         }),
       );
       return;
     }
     if (
       request.method === 'POST' &&
-      url.pathname === '/uploads/repos/bookqaq/zmeow-tools/releases/101/assets'
+      url.pathname === '/uploads/repos/bookqaq/better-zetsumeow-driver/releases/101/assets'
     ) {
       response.statusCode = 201;
       response.end(JSON.stringify({ id: 1, name: url.searchParams.get('name') }));
@@ -225,10 +225,6 @@ test('--publish uploads npm and GitHub release assets', async () => {
         `http://127.0.0.1:${address.port}/api`,
         '--github-upload-url',
         `http://127.0.0.1:${address.port}/uploads`,
-        '--github-owner',
-        'bookqaq',
-        '--github-repo',
-        'zmeow-tools',
         '--npm-registry',
         'https://registry.npmjs.org/',
         '--outdir',
@@ -243,6 +239,9 @@ test('--publish uploads npm and GitHub release assets', async () => {
           ZMEOW_NPM_BIN: fakeNpm,
           ZMEOW_TEST_NPM_LOG: npmLog,
           ZMEOW_TEST_NPM_SNAPSHOT: npmSnapshot,
+          // Empty on purpose: the test must exercise the built-in GitHub repo
+          // defaults (owner/repo), not a repository injected by the environment.
+          GITHUB_REPOSITORY: '',
         },
       },
     );
@@ -284,6 +283,11 @@ test('--publish uploads npm and GitHub release assets', async () => {
     const npmPackage = JSON.parse(await readFile(path.join(npmSnapshot, 'package.json'), 'utf8'));
     assert.equal(npmPackage.name, '@bookqaq/better-zmeow-driver');
     assert.equal(npmPackage.version, version);
+    assert.equal(
+      npmPackage.repository.url,
+      'git+https://github.com/bookqaq/better-zetsumeow-driver.git',
+      'npm package metadata must point at the real GitHub repository',
+    );
     for (const file of [USER_SCRIPT, META_SCRIPT, CHECKSUMS, NOTES, 'README.md', 'LICENSE']) {
       const contents = await readFile(path.join(npmSnapshot, file));
       assert.ok(contents.byteLength > 0, `${file} must be present in the npm package`);
@@ -292,20 +296,20 @@ test('--publish uploads npm and GitHub release assets', async () => {
     const releasePosts = requests.filter(
       (entry) =>
         entry.method === 'POST' &&
-        entry.pathname === '/api/repos/bookqaq/zmeow-tools/releases',
+        entry.pathname === '/api/repos/bookqaq/better-zetsumeow-driver/releases',
     );
     assert.equal(releasePosts.length, 1, 'must create one GitHub release');
     const uploads = requests.filter(
       (entry) =>
         entry.method === 'POST' &&
-        entry.pathname === '/uploads/repos/bookqaq/zmeow-tools/releases/101/assets',
+        entry.pathname === '/uploads/repos/bookqaq/better-zetsumeow-driver/releases/101/assets',
     );
     assert.equal(uploads.length, 4, 'must upload four assets to the GitHub release');
     assert.ok(
       requests.some(
         (entry) =>
           entry.pathname ===
-          `/api/repos/bookqaq/zmeow-tools/releases/tags/userscript-v${version}`,
+          `/api/repos/bookqaq/better-zetsumeow-driver/releases/tags/userscript-v${version}`,
       ),
       'must check for an existing GitHub release',
     );

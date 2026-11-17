@@ -164,7 +164,8 @@ export ZMEOW_GITHUB_TOKEN="ghp_xxx"       # 或 GITHUB_TOKEN
 
 - npm token 需要对 `@bookqaq/better-zmeow-driver` 有发布权限。
 - GitHub token 需要 `repo` 权限（GitHub Actions 中为 `GITHUB_TOKEN`）。
-- GitHub 默认仓库为 `bookqaq/zmeow-tools`；可用
+- GitHub 默认仓库为 `bookqaq/better-zetsumeow-driver`
+  （<https://github.com/bookqaq/better-zetsumeow-driver>）；可用
   `ZMEOW_GITHUB_OWNER` / `ZMEOW_GITHUB_REPO` 或 `--github-owner` / `--github-repo`
   覆盖。GitHub Actions 会自动读取 `GITHUB_REPOSITORY`。
 - npm 默认 registry 为 `https://registry.npmjs.org/`；可用
@@ -287,7 +288,7 @@ curl -fsSL "https://registry.npmmirror.com/@bookqaq/better-zmeow-driver/latest/f
   | sed -n '1,12p'
 
 # GitHub release 资产
-curl -fsSL "https://github.com/bookqaq/zmeow-tools/releases/download/userscript-vX.Y.Z/better-zmeow-driver.meta.js" \
+curl -fsSL "https://github.com/bookqaq/better-zetsumeow-driver/releases/download/userscript-vX.Y.Z/better-zmeow-driver.meta.js" \
   | sed -n '1,12p'
 ```
 
