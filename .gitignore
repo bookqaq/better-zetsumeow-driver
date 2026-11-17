@@ -1,0 +1,48 @@
+# Dependencies (pnpm keeps its store and cache inside the repo)
+node_modules/
+.pnpm-store/
+.npm-cache/
+
+# Build output
+dist/
+*.tsbuildinfo
+*.tgz
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# Local environment overrides
+.env
+.env.*
+!.env.example
+
+# Test / tooling artifacts
+coverage/
+.playwright-mcp/
+test-results/
+playwright-report/
+.zcode/
+tmp-research/
+
+# Editor and OS noise
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+
+# Working research notes and patch artifacts
+docs/RESEARCH-*.md
+*.orig
+*.rej
+*.bak
+
+# Local reference data (kept on disk; not distributed)
+assets/zetsumeow-driver/*
+!assets/zetsumeow-driver/.gitkeep
+
+# Locally generated SDK tables (run extract-from-bundle.mjs)
+packages/zmeow-sdk/src/generated/*
+!packages/zmeow-sdk/src/generated/.gitkeep

@@ -1,0 +1,19 @@
+{
+  "name": "@bookqaq/better-zmeow-driver",
+  "version": "0.2.0",
+  "private": true,
+  "type": "module",
+  "description": "Better ZetsuMeow Driver: Tampermonkey userscript for the ZetsuMeow driver, JSON config backup/restore and Wooting profile import",
+  "license": "MIT",
+  "scripts": {
+    "build": "node build.mjs",
+    "build:debug": "node build.mjs --mode=debug",
+    "build:release": "node build.mjs --mode=release",
+    "release": "node scripts/release.mjs",
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "node --test \"test/**/*.test.mjs\" \"test/**/*.test.ts\""
+  },
+  "dependencies": {
+    "@bookqaq/zmeow-sdk": "workspace:*"
+  }
+}

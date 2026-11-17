@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="dark" />
+    <title>ZetsuMeow SDK Playground</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%90%B1%3C/text%3E%3C/svg%3E" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <header class="page-head">
+      <div>
+        <h1>ZetsuMeow SDK Playground</h1>
+        <p class="subtitle">
+          浏览器端键盘调试台 · 纯静态页面 · 无构建步骤。WebHID 用于键盘，Web Serial 用于屏幕。
+        </p>
+      </div>
+      <div class="head-badges">
+        <span id="hid-support" class="badge badge-muted">检测 WebHID…</span>
+        <span id="sdk-state" class="badge badge-muted">加载 SDK…</span>
+        <a class="badge badge-link" href="../simulator/">键盘模拟器 ↗</a>
+      </div>
+    </header>
+
+    <div id="sdk-banner" class="banner" hidden>
+      <strong>SDK 构建产物不可用。</strong>
+      <span id="sdk-banner-detail"></span>
+    </div>
+
+    <main class="layout">
+      <!-- 1. 连接 -->
+      <section class="card" id="sec-connect">
+        <h2><span class="step">1</span> 连接</h2>
+        <div class="row">
+          <button id="btn-connect" class="primary" data-requires="sdk">连接键盘</button>
+          <button id="btn-disconnect" data-requires="connected">断开键盘</button>
+          <button id="btn-diagnose" data-requires="sdk-any">诊断 HID 接口</button>
+          <span id="conn-state" class="state state-off">未连接</span>
+        </div>
+        <p class="hint">
+          连接只会弹出 <strong>HID</strong> 设备选择框，不会请求串口。屏幕请到「屏幕」区按需连接。
+          键盘是复合设备：如果选择框中出现多个同名接口，请全部勾选授权；SDK 会自动挑选
+          <code>usagePage=0xFF00/0x00FF</code> 且 output 报告为 64 字节的厂商接口。连接失败时可点「诊断 HID 接口」查看每个接口的 usage 与报告长度。
+        </p>
+        <dl id="device-info" class="kv">
+          <div><dt>boardId</dt><dd data-info="boardId">—</dd></div>
+          <div><dt>sn</dt><dd data-info="sn">—</dd></div>
+          <div><dt>固件</dt><dd data-info="firmwareVersion">—</dd></div>
+          <div><dt>运行模式</dt><dd data-info="runMode">—</dd></div>
+          <div><dt>fMode</dt><dd data-info="fMode">—</dd></div>
+          <div><dt>布局</dt><dd data-info="layout">—</dd></div>
+          <div><dt>键数</dt><dd data-info="keyCount">—</dd></div>
+          <div><dt>F 区</dt><dd data-info="hasFRow">—</dd></div>
+        </dl>
+      </section>
+
+      <!-- 2. 布局 -->
+      <section class="card card-wide" id="sec-layout">
+        <h2><span class="step">2</span> 布局</h2>
+        <div class="row row-wrap">
+          <span class="badge" id="layout-mode">布局：—</span>
+          <span class="badge" id="key-count">键数：—</span>
+          <span class="badge" id="has-frow">F 区：—</span>
+          <span id="selection-info" class="state state-muted">未选中任何键</span>
+          <button id="btn-clear-selection" class="small" data-requires="selection">清空选择</button>
+        </div>
+        <p class="hint">
+          点击键帽多选（再次点击取消）。悬停查看 title / hardCode / HID usage。布局由 <code>kb.keys</code>
+          的 <code>geometry</code> 生成，安装 F 区模块时 F 排会自动出现。
+        </p>
+        <div class="keyboard-scroll">
+          <div id="keyboard" class="keyboard" role="group" aria-label="键盘布局">
+            <p class="empty">连接键盘后显示布局。</p>
+          </div>
+        </div>
+        <div class="legend">
+          <span class="legend-item"><i class="swatch swatch-key"></i> 普通键</span>
+          <span class="legend-item"><i class="swatch swatch-frow"></i> F 区键</span>
+          <span class="legend-item"><i class="swatch swatch-selected"></i> 已选中</span>
+        </div>
+      </section>
+
+      <!-- 3. 灯光 -->
+      <section class="card" id="sec-light">
+        <h2><span class="step">3</span> 灯光</h2>
+        <div class="form-grid">
+          <label for="light-mode">灯效模式</label>
+          <select id="light-mode">
+            <option value="0">0 · 关闭灯光</option>
+            <option value="1">1 · 光谱循环</option>
+            <option value="2">2 · 上循环彩虹</option>
+            <option value="3">3 · 内循环彩虹</option>
+            <option value="4">4 · 外循环彩虹</option>
+            <option value="5">5 · 左循环彩虹</option>
+            <option value="6">6 · 漩涡</option>
+            <option value="7">7 · 涟漪</option>
+            <option value="8">8 · 指尖涟漪</option>
+            <option value="9">9 · 指尖律动</option>
+          </select>
+
+          <label for="light-speed">速度 <output id="light-speed-out">80</output></label>
+          <input id="light-speed" type="range" min="0" max="100" step="1" value="80" />
+
+          <label for="light-turn">方向 <output id="light-turn-out">正向</output></label>
+          <input id="light-turn" type="range" min="0" max="1" step="1" value="0" />
+
+          <label for="light-brightness">亮度 <output id="light-brightness-out">8</output></label>
+          <input id="light-brightness" type="range" min="0" max="10" step="1" value="8" />
+
+          <label for="light-color">颜色</label>
+          <input id="light-color" type="color" value="#00e5ff" />
+
+          <label for="light-colorful">彩色模式</label>
+          <input id="light-colorful" type="checkbox" />
+        </div>
+        <div class="row row-wrap">
+          <button id="btn-light-apply" data-requires="connected">应用灯效</button>
+          <button id="btn-light-read" data-requires="connected">读取灯效</button>
+        </div>
+        <pre id="light-out" class="output" hidden></pre>
+
+        <hr />
+        <h3>单键颜色</h3>
+        <div class="row row-wrap">
+          <input id="key-color" type="color" value="#ff0000" aria-label="单键颜色" />
+          <button id="btn-key-color" data-requires="selection">设置选中键颜色</button>
+          <button id="btn-key-colors-read" data-requires="connected">读取键色</button>
+        </div>
+        <pre id="keycolor-out" class="output" hidden></pre>
+      </section>
+
+      <!-- 4. 按键设置 -->
+      <section class="card" id="sec-key">
+        <h2><span class="step">4</span> 按键设置</h2>
+        <p class="hint">
+          先在上方布局区选中键。重映射作用于<strong>全部选中键</strong>，「恢复默认映射」把选中键写回键表里的默认 HID 功能（Fn 层则恢复为该键的普通功能）；RS（深度优先）/ SOCD（后覆盖）需要<strong>正好 2 个</strong>键；
+          MT / TGL / MPT / END 需要<strong>1 个</strong>键（MT 的 hold / tap 也是目标键）。
+        </p>
+
+        <h3>重映射</h3>
+        <div class="form-grid">
+          <label for="target-select">目标键</label>
+          <select id="target-select" data-key-target></select>
+
+          <label for="layer-select">Fn 层</label>
+          <select id="layer-select">
+            <option value="0">0 · 基础层</option>
+            <option value="1">1 · Fn 层</option>
+            <option value="2">2 · Fn2 层</option>
+          </select>
+        </div>
+        <div class="row row-wrap">
+          <button id="btn-remap" data-requires="selection">重映射</button>
+          <button id="btn-remap-reset" data-requires="selection">恢复默认映射</button>
+          <button id="btn-remap-undo" data-requires="connected">恢复到本次修改前</button>
+          <button id="btn-rs" data-requires="two-selection">RS（选 2 键）</button>
+          <button id="btn-socd" data-requires="two-selection">SOCD（选 2 键）</button>
+          <button id="btn-clear-feature" data-requires="selection">清除高级功能</button>
+        </div>
+        <p class="hint" id="remap-undo-hint">本次修改前：暂无记录，先做一次重映射或恢复默认映射。</p>
+
+        <h3>高级功能</h3>
+        <div class="form-grid compact">
+          <label for="mt-hold">MT hold 目标</label>
+          <select id="mt-hold" data-key-target></select>
+          <label for="mt-tap">MT tap 目标</label>
+          <select id="mt-tap" data-key-target></select>
+          <label for="mt-ms">MT 判定 (ms)</label>
+          <input id="mt-ms" type="number" min="10" max="2000" step="10" value="200" />
+          <label for="tgl-target">TGL 目标</label>
+          <select id="tgl-target" data-key-target></select>
+          <label for="mpt-target1">MPT 目标 1</label>
+          <select id="mpt-target1" data-key-target></select>
+          <label for="mpt-target2">MPT 目标 2</label>
+          <select id="mpt-target2" data-key-target></select>
+          <label for="mpt-target3">MPT 目标 3</label>
+          <select id="mpt-target3" data-key-target></select>
+          <label for="mpt-mm1">MPT mm 1</label>
+          <input id="mpt-mm1" type="number" min="0.1" max="3.1" step="0.01" value="0.1" />
+          <label for="mpt-mm2">MPT mm 2</label>
+          <input id="mpt-mm2" type="number" min="0.1" max="3.1" step="0.01" value="0.2" />
+          <label for="mpt-mm3">MPT mm 3</label>
+          <input id="mpt-mm3" type="number" min="0.1" max="3.1" step="0.01" value="0.3" />
+          <label for="end-target">END 目标</label>
+          <select id="end-target" data-key-target></select>
+          <label for="end-ms">END 延时 (ms)</label>
+          <input id="end-ms" type="number" min="10" max="2000" step="10" value="10" />
+        </div>
+        <div class="row row-wrap">
+          <button id="btn-mt" data-requires="selection">设置 MT（点按双效）</button>
+          <button id="btn-tgl" data-requires="selection">设置 TGL（点击持续）</button>
+          <button id="btn-mpt" data-requires="selection">设置 MPT（三行程触发）</button>
+          <button id="btn-end" data-requires="selection">设置 END（弹起跟随）</button>
+          <button id="btn-read-features" data-requires="selection">读取高级功能</button>
+        </div>
+        <pre id="feature-out" class="output" hidden></pre>
+
+        <dl class="feature-help" aria-label="高级功能说明">
+          <div><dt>RS · 深度优先</dt><dd>两个按键中会优先触发按下更深的按键。</dd></div>
+          <div><dt>SOCD · 后覆盖</dt><dd>监测两个按键，后按下的按键会自动释放前一个按键。</dd></div>
+          <div><dt>MT · 点按双效</dt><dd>同时实现两种功能：正常点击触发 <code>tap</code>，按住不放触发 <code>hold</code>。</dd></div>
+          <div><dt>TGL · 点击持续</dt><dd>点击后持续触发某一按键功能，再次点击停止。</dd></div>
+          <div><dt>MPT · 三行程触发</dt><dd>在按键三个不同行程深度分别定义 3 种功能按键。</dd></div>
+          <div><dt>END · 弹起跟随</dt><dd>按键抬起时触发另一个按键。</dd></div>
+        </dl>
+
+        <div class="subsection" id="travel-block">
+          <h3>行程（单键 / 批量）</h3>
+          <p class="hint">
+            单位 mm，步进 0.01。<strong>选中单个键</strong>时只改这一个键（会自动读取该键当前值）；选中多个键则按同一组参数批量写入。
+            <code>press</code> 是触发行程；<code>release / fastOut</code> 是快速触发（RT）的抬起灵敏度与快速复位点，仅在勾选 <code>fast</code> 时生效。
+          </p>
+          <div class="form-grid">
+            <label for="travel-press">press (触发)</label>
+            <input id="travel-press" type="number" min="0.1" max="3.1" step="0.01" value="2" />
+            <label for="travel-release">release (复位)</label>
+            <input id="travel-release" type="number" min="0" max="3.1" step="0.01" value="1.8" />
+            <label for="travel-dead-down">deadDown</label>
+            <input id="travel-dead-down" type="number" min="0" max="1" step="0.01" value="0.2" />
+            <label for="travel-dead-up">deadUp</label>
+            <input id="travel-dead-up" type="number" min="0" max="1" step="0.01" value="0.2" />
+            <label for="travel-fast-out">fastOut</label>
+            <input id="travel-fast-out" type="number" min="0" max="3.1" step="0.01" value="0.1" />
+            <label for="travel-fast">fast</label>
+            <input id="travel-fast" type="checkbox" />
+        </div>
+        <div class="row row-wrap">
+          <button id="btn-travel-apply" data-requires="selection">应用行程</button>
+          <button id="btn-travel-read" data-requires="connected">读取行程配置</button>
+        </div>
+        <pre id="travel-readback" class="output" hidden></pre>
+        </div>
+
+        <h3>其他</h3>
+        <div class="row row-wrap">
+          <label class="inline" for="winlock-value">
+            <input id="winlock-value" type="checkbox" /> 锁 Win
+          </label>
+          <button id="btn-winlock-set" data-requires="connected">设置锁 Win</button>
+          <button id="btn-winlock-read" data-requires="connected">读取锁 Win</button>
+          <span id="winlock-state" class="state state-muted">—</span>
+        </div>
+        <div class="row row-wrap">
+          <label class="inline" for="light-sleep">灯效休眠（分钟）</label>
+          <input id="light-sleep" type="number" min="0" max="120" step="1" value="10" />
+          <button id="btn-light-sleep" data-requires="connected">设置休眠</button>
+          <button id="btn-restore-defaults" data-requires="connected">恢复默认</button>
+        </div>
+      </section>
+
+      <!-- 5. 行程 -->
+
+      <!-- 6. 测试 -->
+      <section class="card card-wide" id="sec-test">
+        <h2><span class="step">5</span> 按键测试</h2>
+        <div class="row row-wrap">
+          <label class="inline" for="test-mode">模式</label>
+          <select id="test-mode">
+            <option value="stroke">stroke（单键行程，cmd 48）</option>
+            <option value="tap">tap（手感测试，cmd 2/2）</option>
+          </select>
+          <button id="btn-test-start" data-requires="connected">开始测试</button>
+          <button id="btn-test-stop" data-requires="connected">停止测试</button>
+          <button id="btn-test-clear" data-requires="connected">清空</button>
+          <span id="test-state" class="state state-off">未运行</span>
+          <span id="input-count" class="state state-muted">input 帧：0</span>
+        </div>
+        <p class="hint">
+          开始后设备约 50Hz 上报每个键的实时行程（<code>cmd 48</code>，空闲帧 hardCode=0 会跳过），按压键帽即可看到条形图变化；
+          「input 帧」会显示收到的命令分布，日志只记录每种命令的第一帧以免刷屏。若按钮无反应，先确认已连接键盘，并检查日志里是否出现 <code>cmd 48</code>。
+        </p>
+        <div class="test-grid">
+          <div>
+            <h3>实时行程（mm）</h3>
+            <div id="travel-bars" class="travel-bars">
+              <p class="empty">开始测试并按压键盘后显示。</p>
+            </div>
+          </div>
+          <div>
+            <h3>最近事件</h3>
+            <ul id="event-list" class="event-list">
+              <li class="empty">暂无事件</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- 7. 屏幕 -->
+      <section class="card" id="sec-screen">
+        <h2><span class="step">6</span> 屏幕</h2>
+        <div class="row row-wrap">
+          <span id="screen-supported" class="badge badge-muted">屏幕：未知</span>
+          <span id="screen-state" class="state state-off">未连接</span>
+          <button id="btn-screen-open" data-requires="screen-supported">连接屏幕</button>
+          <button id="btn-screen-close" data-requires="screen-open">断开屏幕</button>
+        </div>
+        <p class="hint">
+          懒连接：先连键盘，再<strong>点击</strong>「连接屏幕」（Web Serial 必须在用户手势内调用
+          <code>openScreen()</code>）。连接键盘时不会请求串口权限。
+        </p>
+        <div class="row row-wrap">
+          <input id="screen-file" type="file" accept="image/png,image/jpeg" disabled />
+          <label class="inline" for="screen-auto-send">
+            <input id="screen-auto-send" type="checkbox" checked disabled /> 选择后立即发送
+          </label>
+          <button id="btn-screen-send" data-requires="screen-image">发送到屏幕</button>
+        </div>
+        <div class="screen-preview">
+          <canvas id="screen-canvas" width="194" height="368" aria-label="屏幕预览（194×368）"></canvas>
+          <div class="screen-meta">
+            <p class="hint">图像会按 cover 方式裁剪/缩放到 194×368，再取 ImageData 交给 <code>sendImage</code>。</p>
+            <progress id="screen-progress" max="100" value="0"></progress>
+            <p id="screen-progress-text" class="mono">等待图片…</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 8. 日志 -->
+      <section class="card card-wide" id="sec-log">
+        <h2><span class="step">7</span> 日志</h2>
+        <div class="row">
+          <button id="btn-log-clear" class="small">清空日志</button>
+          <span class="hint">所有操作与异常都会追加到这里，便于真机调试。</span>
+        </div>
+        <div id="log" class="log" role="log" aria-live="polite"></div>
+      </section>
+    </main>
+
+    <footer class="page-foot">
+      <span>ZetsuMeow SDK Playground · 参考实现：ZetsuMeow 官方网页驱动</span>
+      <span>
+        SDK 路径：<code>../../packages/zmeow-sdk/dist/index.js</code>
+      </span>
+    </footer>
+
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>

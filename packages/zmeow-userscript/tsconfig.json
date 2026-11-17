@@ -1,0 +1,10 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "paths": {
+      "@bookqaq/zmeow-sdk": ["../zmeow-sdk/src/index.ts"]
+    }
+  },
+  "include": ["src/**/*.ts", "test/**/*.test.ts"]
+}

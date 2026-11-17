@@ -1,0 +1,4 @@
+packages:
+  - packages/*
+  - apps/*
+  # assets/ is reference material only: never a workspace package.

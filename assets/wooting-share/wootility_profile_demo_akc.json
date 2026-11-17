@@ -1,0 +1,230 @@
+{
+  "data": {
+    "metadata": {
+      "icon": "woot:p:black",
+      "color": {
+        "red": 255,
+        "green": 0,
+        "blue": 128
+      }
+    },
+    "version": 15,
+    "remap": [
+      [],
+      [
+        {
+          "index": {
+            "rowNr": 2,
+            "colNr": 2
+          },
+          "value": 5
+        }
+      ]
+    ],
+    "dks": [],
+    "customActuations": [
+      {
+        "index": {
+          "rowNr": 5,
+          "colNr": 5
+        },
+        "value": 1638
+      }
+    ],
+    "name": "Demo AKC Matrix",
+    "desc": "Synthetic fixture generated from the Wootility 2.14.1 schema; no device data.",
+    "guid": "demo-akc-matrix",
+    "target": {
+      "layout": 0,
+      "device": 11
+    },
+    "rgb": {
+      "kbdArray": [
+        null,
+        null,
+        [
+          null,
+          null,
+          {
+            "red": 255,
+            "green": 0,
+            "blue": 0
+          }
+        ]
+      ],
+      "brightness": 255
+    },
+    "analog": {
+      "rapidTriggerSensitivity": 1638,
+      "actPoint": 4096,
+      "rapidTriggerSecondarySensitivity": 410,
+      "perKeyRapidTrigger": [
+        {
+          "index": {
+            "rowNr": 2,
+            "colNr": 2
+          },
+          "value": true
+        },
+        {
+          "index": {
+            "rowNr": 3,
+            "colNr": 1
+          },
+          "value": {
+            "sensitivity": 1638,
+            "secondarySensitivity": 410,
+            "strictActuationRange": true
+          }
+        },
+        {
+          "index": {
+            "rowNr": 3,
+            "colNr": 2
+          },
+          "value": false
+        },
+        {
+          "index": {
+            "rowNr": 5,
+            "colNr": 5
+          },
+          "value": true
+        }
+      ],
+      "rapidTrigger": true,
+      "rapidTriggerStrictActuationRange": true,
+      "tachyonMode": false,
+      "enableDigital": false,
+      "dksTickRate": 2
+    },
+    "akc": [
+      {
+        "keyIndex": {
+          "rowNr": 2,
+          "colNr": 2
+        },
+        "layer": 0,
+        "socd": {
+          "secondaryKey": {
+            "rowNr": 2,
+            "colNr": 3
+          },
+          "socd": 2,
+          "inputBothWhenBottomedOut": false
+        }
+      },
+      {
+        "keyIndex": {
+          "rowNr": 2,
+          "colNr": 4
+        },
+        "layer": 0,
+        "socd": {
+          "secondaryKey": {
+            "rowNr": 2,
+            "colNr": 5
+          },
+          "socd": 3,
+          "inputBothWhenBottomedOut": true
+        }
+      },
+      {
+        "keyIndex": {
+          "rowNr": 2,
+          "colNr": 6
+        },
+        "layer": 0,
+        "socd": {
+          "secondaryKey": {
+            "rowNr": 2,
+            "colNr": 7
+          },
+          "socd": 4,
+          "inputBothWhenBottomedOut": false
+        }
+      },
+      {
+        "keyIndex": {
+          "rowNr": 3,
+          "colNr": 1
+        },
+        "layer": 0,
+        "modTap": {
+          "holdKey": {
+            "byte": 100
+          },
+          "tapKey": {
+            "byte": 1
+          },
+          "holdDuration": 180
+        }
+      },
+      {
+        "keyIndex": {
+          "rowNr": 3,
+          "colNr": 2
+        },
+        "layer": 0,
+        "toggleKey": {
+          "keybind": {
+            "byte": 23
+          }
+        }
+      },
+      {
+        "keyIndex": {
+          "rowNr": 3,
+          "colNr": 3
+        },
+        "layer": 0,
+        "rappySnappy": {
+          "secondaryKey": {
+            "rowNr": 3,
+            "colNr": 4
+          },
+          "socd": 0,
+          "inputBothWhenBottomedOut": true
+        }
+      },
+      {
+        "keyIndex": {
+          "rowNr": 3,
+          "colNr": 5
+        },
+        "layer": 0,
+        "dks": {
+          "keys": [
+            1,
+            2,
+            3,
+            4
+          ]
+        }
+      },
+      {
+        "keyIndex": {
+          "rowNr": 4,
+          "colNr": 4
+        },
+        "layer": 1,
+        "modTap": {
+          "holdKey": {
+            "byte": 100
+          },
+          "tapKey": {
+            "byte": 1
+          }
+        }
+      }
+    ],
+    "gamepad": {
+      "mapping": {
+        "gamepadMappingOverride": false,
+        "mappings": [],
+        "mappingType": 0
+      }
+    },
+    "lightbar": null
+  }
+}
