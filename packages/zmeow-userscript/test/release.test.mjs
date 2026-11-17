@@ -173,7 +173,7 @@ test('--publish uploads npm and GitHub release assets', async () => {
       response.end(
         JSON.stringify({
           id: 101,
-          html_url: 'https://github.com/bookqaq/zmeow-tools/releases/tag/userscript-v0.2.0',
+          html_url: `https://github.com/bookqaq/zmeow-tools/releases/tag/userscript-v${version}`,
         }),
       );
       return;
@@ -303,7 +303,9 @@ test('--publish uploads npm and GitHub release assets', async () => {
     assert.equal(uploads.length, 4, 'must upload four assets to the GitHub release');
     assert.ok(
       requests.some(
-        (entry) => entry.pathname === '/api/repos/bookqaq/zmeow-tools/releases/tags/userscript-v0.2.0',
+        (entry) =>
+          entry.pathname ===
+          `/api/repos/bookqaq/zmeow-tools/releases/tags/userscript-v${version}`,
       ),
       'must check for an existing GitHub release',
     );
