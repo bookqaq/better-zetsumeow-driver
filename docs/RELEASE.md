@@ -133,7 +133,7 @@ pnpm -F @bookqaq/better-zmeow-driver release
 
 默认行为：
 
-1. 校验包名和 semver 版本。
+1. 校验包名和 package.json 中版本。
 2. 要求 git 工作区干净。
 3. 在仓库根目录运行 `pnpm check`。
 4. 构建 release 模式到 `packages/zmeow-userscript/dist/release/`。
