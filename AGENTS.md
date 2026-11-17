@@ -160,7 +160,9 @@ node packages/zmeow-sdk/scripts/extract-from-bundle.mjs --check   # 校验是否
   GitHub tag 格式 `userscript-vX.Y.Z`，npm 包名 `@bookqaq/better-zmeow-driver`。
 - `release` 脚本要求干净工作区并运行 `pnpm check`；不带参数时只生成本地产物与校验文件。
   `--publish` 会发布 npm 包并通过 GitHub API 创建 release / 上传资产（不执行 git
-  commit/push），`--dry-run` 只打印计划；token 与镜像配置见发布文档。
+  commit/push），`--dry-run` 只打印计划；token 与镜像配置见发布文档。npm 的 2FA
+  （网页认证或 OTP）需要交互终端：`--publish` 用继承 stdio 运行 npm 并等待认证完成，
+  默认最长等 30 分钟（`ZMEOW_PUBLISH_TIMEOUT_MS` 可调），不要通过管道/CI 跑。
 - 自动更新 metadata 默认指向 npmmirror 的 npm CDN；可用 `ZMEOW_UPDATE_BASE_URL` 或
   `--update-base-url` 切换 jsDelivr / unpkg / 自建静态目录。
 - `@bookqaq/zmeow-sdk` 目前只作为 workspace 包使用，未配置 npm 发布。

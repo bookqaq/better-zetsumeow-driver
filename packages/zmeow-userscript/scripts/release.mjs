@@ -10,6 +10,12 @@
  *   1. publishes the userscript package to the npm registry, and
  *   2. creates a GitHub Release and uploads the same assets.
  *
+ * `npm publish` runs with the terminal attached (inherited stdio) so npm can
+ * complete its two-factor authentication: it prints the web-auth URL, waits for
+ * ENTER, opens the browser and polls until the account owner finishes. The
+ * script waits for npm instead of capturing output, so a 2FA challenge is never
+ * skipped or bypassed.
+ *
  * Auto-update metadata points at the npm mirror by default, so Tampermonkey
  * users can update through npmmirror in mainland China.
  *
@@ -71,6 +77,10 @@ const DEFAULT_GITHUB_UPLOAD_URL = 'https://uploads.github.com';
 const DEFAULT_GITHUB_OWNER = 'bookqaq';
 const DEFAULT_GITHUB_REPO = 'zmeow-tools';
 const DEFAULT_NPM_REGISTRY = 'https://registry.npmjs.org/';
+// npm publish may stop for a browser-based 2FA challenge (or a classic OTP
+// prompt) and poll until the account owner finishes it. That is interactive by
+// design, so npm runs with inherited stdio and this script waits for it.
+const DEFAULT_PUBLISH_TIMEOUT_MS = 30 * 60 * 1000;
 
 const DEBUG_TRACES = [
   'data-action="keyboard"',
@@ -278,8 +288,13 @@ function printUsage() {
       '',
       'Env: ZMEOW_NPM_TOKEN / NPM_TOKEN, ZMEOW_GITHUB_TOKEN / GITHUB_TOKEN,',
       '  ZMEOW_UPDATE_BASE_URL, ZMEOW_NPM_REGISTRY, ZMEOW_GITHUB_API_URL,',
-      '  ZMEOW_GITHUB_UPLOAD_URL, ZMEOW_GITHUB_OWNER, ZMEOW_GITHUB_REPO.',
+      '  ZMEOW_GITHUB_UPLOAD_URL, ZMEOW_GITHUB_OWNER, ZMEOW_GITHUB_REPO,',
+      '  ZMEOW_PUBLISH_TIMEOUT_MS (default 1800000, npm 2FA wait).',
       '  GitHub Actions: GITHUB_REPOSITORY and GITHUB_TOKEN are also accepted.',
+      '',
+      'npm publish inherits the terminal so a web 2FA page or OTP prompt can be',
+      'completed; the script waits until npm finishes. Run it from a terminal,',
+      'not through a pipe, when the npm account requires two-factor auth.',
     ].join('\n'),
   );
 }
@@ -627,19 +642,40 @@ async function publishNpm({ plan, version, outdir }) {
     ];
     if (userconfig !== null) args.push('--userconfig', userconfig);
 
+    // npm's 2FA handling (web page or classic OTP prompt) is gated on
+    // process.stdin.isTTY && process.stdout.isTTY in npm's otplease(). Inherit
+    // both streams and stdin so npm can print the auth URL, wait for ENTER,
+    // open the browser and poll until the account owner completes the challenge.
+    // Never capture stdio here: that silently disables the interactive flow.
+    const timeout = publishTimeoutMs();
+    if (process.stdin.isTTY && process.stdout.isTTY) {
+      console.log(
+        `[publish] npm may open a 2FA page or ask for an OTP; finish it in the browser/terminal, this script waits up to ${formatDuration(timeout)}.`,
+      );
+    } else {
+      console.warn(
+        '[publish] warning: no TTY for npm; interactive 2FA (web page or OTP prompt) cannot be completed. Run from a terminal if npm asks for authentication.',
+      );
+    }
+
     const result = spawnSync(npmCommand(), args, {
       cwd: REPO_ROOT,
-      encoding: 'utf8',
-      timeout: 300000,
+      stdio: 'inherit',
+      timeout,
     });
     if (result.error !== undefined) {
+      if (result.error.code === 'ETIMEDOUT') {
+        throw new Error(
+          `npm publish was still waiting after ${formatDuration(timeout)}; if a web/OTP authentication page was open, complete it and retry, or raise ZMEOW_PUBLISH_TIMEOUT_MS.`,
+        );
+      }
       throw new Error(
         `Cannot run npm: ${result.error.message}\nInstall npm or use --skip-npm.`,
       );
     }
     if (result.status !== 0) {
       throw new Error(
-        `npm publish failed with exit code ${result.status}.\n${result.stderr || result.stdout}`,
+        `npm publish failed with exit code ${result.status}. See the npm output above; 2FA failures require a terminal so npm can prompt.`,
       );
     }
     console.log(`[publish] npm: ${PACKAGE_NAME}@${version} -> ${plan.npm.registry}`);
@@ -697,6 +733,26 @@ function npmCommand() {
 
 function npmPackageUrl(version) {
   return `https://www.npmjs.com/package/${PACKAGE_NAME}/v/${version}`;
+}
+
+function publishTimeoutMs() {
+  const raw = process.env['ZMEOW_PUBLISH_TIMEOUT_MS'];
+  if (raw === undefined || raw.trim() === '') return DEFAULT_PUBLISH_TIMEOUT_MS;
+  const value = Number(raw);
+  if (!Number.isFinite(value) || value <= 0) {
+    throw new Error(
+      `ZMEOW_PUBLISH_TIMEOUT_MS must be a positive number of milliseconds, got "${raw}".`,
+    );
+  }
+  return value;
+}
+
+function formatDuration(ms) {
+  if (ms >= 60000) {
+    const minutes = ms / 60000;
+    return `${Number.isInteger(minutes) ? minutes : minutes.toFixed(1)} min`;
+  }
+  return `${Math.round(ms / 1000)} s`;
 }
 
 async function assertGithubReleaseAbsent(plan, tag) {

@@ -2,3 +2,6 @@ packages:
   - packages/*
   - apps/*
   # assets/ is reference material only: never a workspace package.
+# Keep the pnpm store inside the repo so installs work in the writable sandbox.
+# pnpm-only setting: npm does not understand `store-dir` in .npmrc and warns.
+storeDir: .pnpm-store

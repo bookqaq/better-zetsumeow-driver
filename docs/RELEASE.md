@@ -198,6 +198,26 @@ node packages/zmeow-userscript/scripts/release.mjs --publish
 
 npm 包不包含源码或 workspace 依赖，只是可分发的用户脚本包。
 
+### 5.4 npm 2FA（网页认证）
+
+npm 账号开启两步验证后，`npm publish` 需要完成一次网页认证，发布脚本支持并等待它：
+
+1. 终端打印认证地址并提示 `Press ENTER to open in the browser...`，按回车；
+2. 浏览器打开 npm 页面，完成 2FA（认证不可绕过，脚本不会跳过或伪造 OTP）；
+3. npm 轮询到认证成功后自动重试发布，`release.mjs` 会一直等到 npm 退出，再继续
+   GitHub release 步骤。
+
+实现上 `npm publish` 以 `stdio: 'inherit'` 运行，`stdin`/`stdout` 直接连到当前终端
+（npm 的 `otplease()` 只有在两者都是 TTY 时才会走网页/OTP 流程）。因此：
+
+- 必须在真实终端里运行 `--publish`，不要用管道或重定向输出（如 `| tee`）；
+- CI 中没有交互终端，无法完成网页认证，只能用不需要交互的发布凭据；
+- 默认最多等待 30 分钟，可用 `ZMEOW_PUBLISH_TIMEOUT_MS`（毫秒）调整：
+
+```bash
+ZMEOW_PUBLISH_TIMEOUT_MS=3600000 node packages/zmeow-userscript/scripts/release.mjs --publish
+```
+
 如果 npm 成功但 GitHub 失败，可先修复 GitHub 凭据/仓库配置，再重试：
 
 ```bash
@@ -303,7 +323,7 @@ curl -fsSL "https://github.com/bookqaq/zmeow-tools/releases/download/userscript-
 | --- | --- |
 | npm 报 401/403 | 检查 `ZMEOW_NPM_TOKEN` / `NPM_TOKEN` 是否有该 scope 的发布权限 |
 | npm 报版本已存在 | 修改 `packages/zmeow-userscript/package.json` 的版本，不能复用已发布版本 |
-| npm 要求 OTP | 在支持 OTP 的环境发布，或改用有发布权限的自动化 token |
+| npm 要求 OTP / 2FA | 在真实终端运行 `--publish` 并完成网页认证；脚本会等待。无 TTY（管道、CI）时 npm 会直接失败 |
 | GitHub 401/403 | 检查 token 与 `ZMEOW_GITHUB_OWNER` / `ZMEOW_GITHUB_REPO` |
 | GitHub release 已存在 | 若是失败重试，先删除不完整的 release（tag 可保留），再用 `--publish --skip-npm` 重试；否则提升版本后重新发布 |
 | npm mirror 上的更新 404 | 等待 npmmirror 同步，或换 jsDelivr/unpkg 基址重新发布 |
@@ -314,6 +334,9 @@ curl -fsSL "https://github.com/bookqaq/zmeow-tools/releases/download/userscript-
 ## 10. 可选的 CI 自动化
 
 GitHub Actions 中可直接使用 `GITHUB_TOKEN` 和 npm automation token：
+
+> 注意：网页 2FA 需要交互终端，CI 里无法完成；CI 发布需要用账号允许的自动化
+> 发布凭据，或者改在本地终端执行 `--publish` 并完成网页认证。
 
 ```yaml
 permissions:

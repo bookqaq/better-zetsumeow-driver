@@ -319,6 +319,82 @@ test('--publish uploads npm and GitHub release assets', async () => {
   }
 });
 
+test('--publish runs npm with inherited stdio so 2FA prompts can be answered', async () => {
+  const interactiveLog = path.join(workspace, 'interactive-npm.json');
+  const fakeNpm = path.join(workspace, 'interactive-npm.mjs');
+  await writeFile(
+    fakeNpm,
+    [
+      '#!/usr/bin/env node',
+      "import { writeFile } from 'node:fs/promises';",
+      "console.log('fake-npm: Press ENTER to open in the browser...');",
+      'const timer = setTimeout(async () => {',
+      "  await writeFile(process.env.ZMEOW_TEST_TTY_LOG, JSON.stringify({ input: null }));",
+      '  process.exit(2);',
+      '}, 10000);',
+      "process.stdin.setEncoding('utf8');",
+      "process.stdin.once('data', async (chunk) => {",
+      '  clearTimeout(timer);',
+      '  await writeFile(process.env.ZMEOW_TEST_TTY_LOG, JSON.stringify({ input: chunk }));',
+      '  process.exit(0);',
+      '});',
+      '',
+    ].join('\n'),
+    'utf8',
+  );
+  await chmod(fakeNpm, 0o755);
+
+  const child = spawn(
+    process.execPath,
+    [
+      RELEASE_SCRIPT,
+      '--publish',
+      '--skip-github',
+      '--skip-check',
+      '--allow-dirty',
+      '--outdir',
+      path.join(workspace, 'interactive-release'),
+    ],
+    {
+      cwd: PACKAGE_ROOT,
+      env: {
+        ...process.env,
+        ZMEOW_NPM_TOKEN: 'test-npm-token',
+        ZMEOW_NPM_BIN: fakeNpm,
+        ZMEOW_TEST_TTY_LOG: interactiveLog,
+      },
+    },
+  );
+
+  let stdout = '';
+  let stderr = '';
+  let answered = false;
+  child.stdout.setEncoding('utf8');
+  child.stderr.setEncoding('utf8');
+  child.stdout.on('data', (chunk) => {
+    stdout += chunk;
+    if (!answered && stdout.includes('Press ENTER to open in the browser')) {
+      answered = true;
+      child.stdin.write('\n');
+    }
+  });
+  child.stderr.on('data', (chunk) => {
+    stderr += chunk;
+  });
+
+  const killTimer = setTimeout(() => child.kill('SIGKILL'), 60000);
+  const [code] = await once(child, 'close');
+  clearTimeout(killTimer);
+  assert.equal(code, 0, `release.mjs --publish failed\n--- stdout ---\n${stdout}\n--- stderr ---\n${stderr}`);
+  assert.ok(answered, 'the fake npm prompt must reach the terminal through inherited stdout');
+
+  const result = JSON.parse(await readFile(interactiveLog, 'utf8'));
+  assert.ok(
+    typeof result.input === 'string' && result.input.includes('\n'),
+    'npm must receive stdin through inherited stdio for web 2FA / OTP prompts',
+  );
+});
+
 function escapeRegExp(value) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
