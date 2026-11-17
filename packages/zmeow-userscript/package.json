@@ -1,6 +1,6 @@
 {
   "name": "@bookqaq/better-zmeow-driver",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "private": true,
   "type": "module",
   "description": "Better ZetsuMeow Driver: Tampermonkey userscript for the ZetsuMeow driver, JSON config backup/restore and Wooting profile import",

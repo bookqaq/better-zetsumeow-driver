@@ -1,6 +1,6 @@
 {
   "name": "@bookqaq/zmeow-manual",
-  "version": "0.0.0",
+  "version": "0.3.2",
   "private": true,
   "type": "module",
   "description": "Better ZetsuMeow Driver user manual (VitePress static site)",
