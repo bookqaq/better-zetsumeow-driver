@@ -30,7 +30,8 @@
 
 1. 在 [Wootility Web](https://wootility.io/) 中打开要迁移的键盘 profile。
 2. 使用 Wootility 的分享功能生成 profile 分享码（profile code）。
-3. 回到 ZetsuMeow 驱动页，在面板 **导入 Wooting 配置** 一栏粘贴分享码，点击 **导入**。
+3. 回到 ZetsuMeow 驱动页，按官方驱动页面的流程连接键盘（正常授权 HID 设备）。
+3. 在面板 **导入 Wooting 配置** 一栏粘贴分享码，点击 **导入**。
 
 分享码会发送到 Wootility 的分享接口（`api.wooting.io`）以取回 profile。请求由
 Tampermonkey 的 `GM_xmlhttpRequest` 发出，因此不受驱动页 CORS 限制；该接口有大约

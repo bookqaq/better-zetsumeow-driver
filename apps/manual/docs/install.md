@@ -62,11 +62,10 @@ https://cdn.jsdelivr.net/npm/@bookqaq/better-zmeow-driver/better-zmeow-driver.us
 
 ## 第一次运行
 
-1. 打开 `https://driver.zetsumeow.com/`。
+1. 打开 `https://driver.zetsumeow.com/`，页面右下角会出现 **Better ZetsuMeow Driver** 面板。
 2. 按官方驱动页面的流程连接键盘（正常授权 HID 设备）。
-3. 连接成功后，页面右下角会出现 **Better ZetsuMeow Driver** 面板。
-   如果面板没有出现，先刷新页面；仍不出现时见[常见问题](/faq)。
-4. 打开面板的 **设置** 页签，确认语言为简体中文或 English。
+3. 连接成功后，即可正常使用。
+4. 若想调整面板语言，打开面板的 **设置** 页签，设置语言为简体中文或 English。
 
 打开面板的 **主面板** 页签，可以看到连接状态、页面指纹、帧数和 SDK 状态。
 各字段的含义见[界面说明](/panel)。
