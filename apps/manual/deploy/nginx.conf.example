@@ -1,0 +1,62 @@
+# Better ZetsuMeow Driver 用户手册 — nginx 托管示例
+#
+# 用法（在仓库根目录）：
+#   pnpm -F @bookqaq/zmeow-manual build
+#   sudo mkdir -p /var/www/zmeow-manual
+#   sudo rsync -a --delete apps/manual/docs/.vitepress/dist/ /var/www/zmeow-manual/
+#   sudo cp apps/manual/deploy/nginx.conf.example /etc/nginx/sites-available/zmeow-manual.conf
+#   sudo ln -s /etc/nginx/sites-available/zmeow-manual.conf /etc/nginx/sites-enabled/
+#   sudo nginx -t && sudo systemctl reload nginx
+#
+# 部署到子路径（如 https://example.com/manual/）时，构建需设置 MANUAL_BASE=/manual/，
+# 并把下面的 root / location 换成对应的 alias。详见 apps/manual/README.md。
+
+server {
+    listen 80;
+    listen [::]:80;
+    server_name manual.example.com;
+
+    root /var/www/zmeow-manual;
+    index index.html;
+    charset utf-8;
+
+    # VitePress 生成 *.html；顺带兼容不带扩展名的访问（/install -> /install.html）。
+    location / {
+        try_files $uri $uri.html $uri/ =404;
+    }
+
+    error_page 404 /404.html;
+
+    # 带 hash 的构建资源可以长期缓存。
+    location /assets/ {
+        expires 1y;
+        add_header Cache-Control "public, max-age=31536000, immutable";
+        try_files $uri =404;
+    }
+
+    # HTML 每次回源校验，保证重新部署后立刻生效。
+    location ~* \.html$ {
+        expires -1;
+        try_files $uri =404;
+    }
+
+    gzip on;
+    gzip_vary on;
+    gzip_comp_level 6;
+    gzip_min_length 1024;
+    gzip_types text/plain text/css application/javascript application/json image/svg+xml;
+
+    # 基础安全头。注意：某个 location 自己写了 add_header 时，nginx 不再继承
+    # server 级的 add_header；需要时请在该 location 内重复设置。
+    # CSP 与 docs/public/_headers 保持一致，已按 VitePress 产物验证。
+    add_header X-Content-Type-Options nosniff always;
+    add_header Referrer-Policy strict-origin-when-cross-origin always;
+    add_header X-Frame-Options DENY always;
+    add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; connect-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'" always;
+
+    # 可选：HTTPS。certbot --nginx 会自动补全证书路径。
+    # listen 443 ssl http2;
+    # listen [::]:443 ssl http2;
+    # ssl_certificate     /etc/letsencrypt/live/manual.example.com/fullchain.pem;
+    # ssl_certificate_key /etc/letsencrypt/live/manual.example.com/privkey.pem;
+}

@@ -46,7 +46,8 @@ zmeow-tools/
 ├─ apps/
 │  ├─ serve.mjs                      # 静态服务器（多线程 + no-cache）
 │  ├─ playground/                    # 纯静态调试台（无构建、无 CDN）
-│  └─ simulator/                     # 键盘模拟器（假 WebHID/Serial）
+│  ├─ simulator/                     # 键盘模拟器（假 WebHID/Serial）
+│  └─ manual/                        # 用户手册站点（VitePress，独立部署；见 apps/manual/README.md）
 ├─ docs/                             # SDK.md、PROTOCOL.md、TAP.md、WOOTING-IMPORT.md、RELEASE.md、截图
 ├─ LICENSE                           # MIT
 ├─ package.json                      # 根脚本
@@ -67,6 +68,8 @@ pnpm -F @bookqaq/better-zmeow-driver build  # 生成 dist/better-zmeow-driver*.u
 pnpm -F @bookqaq/better-zmeow-driver release # 本地打包到 dist/release/；加 -- --publish 发 npm + GitHub
 pnpm check                     # typecheck + test + build（提交前必跑）
 pnpm serve                     # 静态服务器 http://localhost:8099/apps/playground/
+pnpm manual                    # 构建用户手册 → apps/manual/docs/.vitepress/dist/
+pnpm manual:dev                # 本地预览手册 http://localhost:5173
 ```
 
 单独跑一个测试文件：
@@ -79,6 +82,8 @@ node --test --test-name-pattern "remap" "test/**/*.test.ts"
 ## 技术栈与代码约定
 
 - Node **≥ 22.18**、pnpm 11、TypeScript 5.9；**零运行时依赖**，不要引入 npm 包。
+- `apps/manual` 是例外：用户手册站点用 VitePress（构建期依赖，独立于 `packages/`）生成静态网页，
+  可以部署到 Cloudflare Pages / nginx；不要把它接入 SDK、油猴包或发布产物。
 - 源码里相对导入必须带 `.ts` 扩展名（`allowImportingTsExtensions` + `rewriteRelativeImportExtensions`）。
 - `verbatimModuleSyntax`：类型导入写 `import type { ... }`。
 - `erasableSyntaxOnly`：不能用 `enum` / `namespace` / 构造函数参数属性；命令字用 `const` 对象 + `as const`（见 `protocol/commands.ts`）。
@@ -160,11 +165,13 @@ node packages/zmeow-sdk/scripts/extract-from-bundle.mjs --check   # 校验是否
   GitHub tag 格式 `userscript-vX.Y.Z`，npm 包名 `@bookqaq/better-zmeow-driver`。
 - `release` 脚本要求干净工作区并运行 `pnpm check`；不带参数时只生成本地产物与校验文件。
   `--publish` 会发布 npm 包并通过 GitHub API 创建 release / 上传资产（不执行 git
-  commit/push），`--dry-run` 只打印计划；token 与镜像配置见发布文档。npm 的 2FA
+  commit/push），`--dry-run` 只打印计划；token 与更新地址配置见发布文档。npm 的 2FA
   （网页认证或 OTP）需要交互终端：`--publish` 用继承 stdio 运行 npm 并等待认证完成，
   默认最长等 30 分钟（`ZMEOW_PUBLISH_TIMEOUT_MS` 可调），不要通过管道/CI 跑。
-- 自动更新 metadata 默认指向 npmmirror 的 npm CDN；可用 `ZMEOW_UPDATE_BASE_URL` 或
-  `--update-base-url` 切换 jsDelivr / unpkg / 自建静态目录。
+- 自动更新 metadata 使用 jsDelivr 的 npm CDN；仅在自建静态目录时，才用
+  `ZMEOW_UPDATE_BASE_URL` 或 `--update-base-url` 覆盖。
 - `@bookqaq/zmeow-sdk` 目前只作为 workspace 包使用，未配置 npm 发布。
 - SDK 版本号在 `packages/zmeow-sdk/package.json`；`files` 只包含 `dist` 与 `README.md`。
 - 提交前跑 `pnpm check`，并确认 `pnpm -F @bookqaq/zmeow-sdk build` 后 Playground 能正常加载。
+- 用户手册站点见 `apps/manual/README.md`；脚本行为或用户可见流程变化时同步更新
+  `apps/manual/docs/*.md`（版本号由构建自动读取 `package.json`）。

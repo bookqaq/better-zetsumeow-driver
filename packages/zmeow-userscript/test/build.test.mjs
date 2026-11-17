@@ -61,6 +61,7 @@ test('emits a Tampermonkey metadata header', () => {
     [/^\/\/ @namespace\s+\S+/m, '@namespace'],
     [new RegExp(`^// @version\\s+${escapeRegExp(packageVersion)}$`, 'm'), `@version ${packageVersion}`],
     [/^\/\/ @description\s+\S+/m, '@description'],
+    [/^\/\/ @author\s+bookqaq$/m, '@author bookqaq'],
     [/^\/\/ @license\s+MIT$/m, '@license MIT'],
     [/^\/\/ @run-at\s+document-start$/m, '@run-at document-start'],
     [/^\/\/ @grant\s+GM_xmlhttpRequest$/m, '@grant GM_xmlhttpRequest'],

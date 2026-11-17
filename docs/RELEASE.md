@@ -7,10 +7,9 @@
 发布目标：
 
 - **npm registry**：发布包含 `.user.js` / `.meta.js` 的 `@bookqaq/better-zmeow-driver`
-  包，供 Tampermonkey 自动更新和 npm CDN / 镜像读取。
+  包，供 Tampermonkey 自动更新和 npm CDN 读取。
 - **GitHub Releases**：创建版本化 release，上传同一组资产、校验和与发布说明。
-- 自动更新默认走 `registry.npmmirror.com`，方便国内网络访问；也可改用 jsDelivr、
-  unpkg 或自建静态地址。
+- 自动更新使用 jsDelivr（`cdn.jsdelivr.net`）。
 
 ## 1. 发布物
 
@@ -89,6 +88,7 @@ sed -n '1,24p' packages/zmeow-userscript/dist/better-zmeow-driver.release.meta.j
   `zmeow-driver-tap.*`。
 - `@name` 精确为 `Better ZetsuMeow Driver`。
 - `@version` 等于 `package.json` 的版本。
+- `@author` 为 `bookqaq`。
 - `@license` 为 `MIT`。
 - release 的 `@match` 只包含生产 origin。
 - 没有 `PRODUCTION ORIGIN PLACEHOLDER`。
@@ -240,42 +240,27 @@ node packages/zmeow-userscript/scripts/release.mjs --publish --skip-npm
 release 产物的 metadata 默认包含：
 
 ```js
-// @downloadURL  https://registry.npmmirror.com/@bookqaq/better-zmeow-driver/latest/files/better-zmeow-driver.user.js
-// @updateURL    https://registry.npmmirror.com/@bookqaq/better-zmeow-driver/latest/files/better-zmeow-driver.meta.js
+// @downloadURL  https://cdn.jsdelivr.net/npm/@bookqaq/better-zmeow-driver/better-zmeow-driver.user.js
+// @updateURL    https://cdn.jsdelivr.net/npm/@bookqaq/better-zmeow-driver/better-zmeow-driver.meta.js
 ```
 
 Tampermonkey 会定期读取 `@updateURL`，比较 `@version` 后提示更新，再从
-`@downloadURL` 下载新脚本。npm 包根目录直接放置两个脚本，因此 npmmirror 的
-`/latest/files/<file>` 路径可用。
+`@downloadURL` 下载新脚本。npm 包根目录直接放置两个脚本，因此 jsDelivr 的
+`/npm/@bookqaq/better-zmeow-driver/<file>` 路径可用（不固定版本号时解析到 latest）。
 
-可替换的镜像/静态地址：
+更新地址固定在 jsDelivr：
 
 | 服务 | 更新基址 |
 | --- | --- |
-| npmmirror（默认，国内加速） | `https://registry.npmmirror.com/@bookqaq/better-zmeow-driver/latest/files` |
-| jsDelivr | `https://cdn.jsdelivr.net/npm/@bookqaq/better-zmeow-driver@latest` |
-| unpkg | `https://unpkg.com/@bookqaq/better-zmeow-driver@latest` |
-| 自建静态目录 | 任意同时托管两个文件的 HTTPS 目录 |
+| jsDelivr | `https://cdn.jsdelivr.net/npm/@bookqaq/better-zmeow-driver` |
 
-切换基址：
+更新地址写在已安装的脚本里；更换地址后，旧安装仍会访问旧地址，需要用新地址重新
+安装一次或发布一次包含新地址的版本。默认地址由 `DEFAULT_UPDATE_BASE_URL` 维护，
+仅在确实需要自建静态目录时，才用 `ZMEOW_UPDATE_BASE_URL` 或
+`--update-base-url` 覆盖。
 
-```bash
-ZMEOW_UPDATE_BASE_URL="https://cdn.jsdelivr.net/npm/@bookqaq/better-zmeow-driver@latest" \
-  node packages/zmeow-userscript/scripts/release.mjs --publish
-```
-
-或：
-
-```bash
-node packages/zmeow-userscript/scripts/release.mjs --publish \
-  --update-base-url "https://cdn.jsdelivr.net/npm/@bookqaq/better-zmeow-driver@latest"
-```
-
-注意：更新地址写在已安装的脚本里；切换镜像后，旧安装仍会访问旧地址，需要用新地址
-重新安装一次或发布一次包含新地址的版本。
-
-npmmirror 同步 npm 可能有延迟。发布后若 `@updateURL` 暂时 404，等待同步完成即可；
-GitHub Release 资产不受此影响，可作为手动安装/回退来源。
+jsDelivr 对未固定版本的路径有缓存，新版本发布后 `@updateURL` 可能在一段时间内仍是旧内容；
+需要立即生效时从 GitHub Release 手动安装；期间可从 Releases 回退或手动安装。
 
 ## 7. 发布后验证
 
@@ -283,8 +268,8 @@ GitHub Release 资产不受此影响，可作为手动安装/回退来源。
 # npm 版本
 npm view @bookqaq/better-zmeow-driver version
 
-# npm mirror 上的 metadata 必须是新版本
-curl -fsSL "https://registry.npmmirror.com/@bookqaq/better-zmeow-driver/latest/files/better-zmeow-driver.meta.js" \
+# CDN 上的 metadata（jsDelivr 有缓存，刚发布时可能仍是旧版本）
+curl -fsSL "https://cdn.jsdelivr.net/npm/@bookqaq/better-zmeow-driver/better-zmeow-driver.meta.js" \
   | sed -n '1,12p'
 
 # GitHub release 资产
@@ -327,7 +312,7 @@ curl -fsSL "https://github.com/bookqaq/better-zetsumeow-driver/releases/download
 | npm 要求 OTP / 2FA | 在真实终端运行 `--publish` 并完成网页认证；脚本会等待。无 TTY（管道、CI）时 npm 会直接失败 |
 | GitHub 401/403 | 检查 token 与 `ZMEOW_GITHUB_OWNER` / `ZMEOW_GITHUB_REPO` |
 | GitHub release 已存在 | 若是失败重试，先删除不完整的 release（tag 可保留），再用 `--publish --skip-npm` 重试；否则提升版本后重新发布 |
-| npm mirror 上的更新 404 | 等待 npmmirror 同步，或换 jsDelivr/unpkg 基址重新发布 |
+| CDN 上的更新 404 | 确认 npm 包已发布且版本已同步；刚发布时等待 jsDelivr 缓存过期，期间可从 GitHub Release 手动安装 |
 | 自动更新不触发 | 确认 `@updateURL` 可访问、`@version` 增加、Tampermonkey 允许该脚本更新 |
 | release 仍匹配 localhost | 检查 `buildHeader()` 的 release 分支，发布脚本会拒绝该产物 |
 | 校验命令不存在 | macOS 用 `shasum -a 256 -c`，Linux 用 `sha256sum -c` |

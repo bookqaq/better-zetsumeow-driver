@@ -16,8 +16,8 @@
  * script waits for npm instead of capturing output, so a 2FA challenge is never
  * skipped or bypassed.
  *
- * Auto-update metadata points at the npm mirror by default, so Tampermonkey
- * users can update through npmmirror in mainland China.
+ * Auto-update metadata points at the jsDelivr npm CDN by default, and can be
+ * overridden with ZMEOW_UPDATE_BASE_URL or --update-base-url.
  *
  * Usage:
  *   node scripts/release.mjs
@@ -27,7 +27,7 @@
  *
  * Defaults:
  *   outdir  dist/release
- *   update  https://registry.npmmirror.com/@bookqaq/better-zmeow-driver/latest/files
+ *   update  https://cdn.jsdelivr.net/npm/@bookqaq/better-zmeow-driver
  *
  * The default run requires a clean git working tree and executes `pnpm check`
  * from the repository root. `--skip-check` and `--allow-dirty` exist for local
@@ -71,7 +71,7 @@ const CHECKSUMS = 'SHA256SUMS.txt';
 const NOTES = 'RELEASE-NOTES.md';
 
 const DEFAULT_UPDATE_BASE_URL =
-  'https://registry.npmmirror.com/@bookqaq/better-zmeow-driver/latest/files';
+  'https://cdn.jsdelivr.net/npm/@bookqaq/better-zmeow-driver';
 const DEFAULT_GITHUB_API_URL = 'https://api.github.com';
 const DEFAULT_GITHUB_UPLOAD_URL = 'https://uploads.github.com';
 const DEFAULT_GITHUB_OWNER = 'bookqaq';
@@ -432,6 +432,10 @@ function validateArtifacts({ userScript, metaScript, version, userFile, updateBa
   assert(
     new RegExp(`^// @version\\s+${escapeRegExp(version)}$`, 'm').test(userScript),
     `@version must match packages/zmeow-userscript/package.json (${version}).`,
+  );
+  assert(
+    /^\/\/ @author\s+\S+/m.test(userScript),
+    'Release artifact must declare @author.',
   );
   assert(
     /^\/\/ @license\s+MIT$/m.test(userScript),
@@ -932,7 +936,7 @@ function printSummary({ version, outdir, artifacts, dirty, updateBaseUrl, publis
     } else {
       if (publishResult.npmUrl !== null) console.log(`[release] npm: ${publishResult.npmUrl}`);
       if (publishResult.githubUrl !== null) console.log(`[release] GitHub: ${publishResult.githubUrl}`);
-      console.log('[release] Installed scripts auto-update from the npm mirror metadata URL.');
+      console.log('[release] Installed scripts auto-update from the jsDelivr metadata URL.');
     }
     return;
   }

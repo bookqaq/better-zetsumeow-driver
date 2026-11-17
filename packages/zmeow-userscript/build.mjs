@@ -620,6 +620,7 @@ function buildHeader(mode, updateBaseUrl = null) {
     '// @namespace    https://github.com/bookqaq/better-zetsumeow-driver',
     `// @version      ${readVersion()}`,
     '// @description  Better ZetsuMeow Driver — ZetsuMeow driver tap, JSON config backup/restore and Wooting profile import.',
+    '// @author       bookqaq',
     '// @license      MIT',
     ...(mode === 'release' && updateBaseUrl !== null
       ? [

@@ -13,7 +13,10 @@
     "test": "pnpm -r --filter \"./packages/**\" test",
     "typecheck": "pnpm -r --filter \"./packages/**\" typecheck",
     "check": "pnpm run typecheck && pnpm run test && pnpm run build",
-    "serve": "node apps/serve.mjs"
+    "serve": "node apps/serve.mjs",
+    "manual": "pnpm -F @bookqaq/zmeow-manual build",
+    "manual:dev": "pnpm -F @bookqaq/zmeow-manual dev",
+    "manual:preview": "pnpm -F @bookqaq/zmeow-manual preview"
   },
   "devDependencies": {
     "@types/node": "^22.10.0",

@@ -28,21 +28,19 @@
 
 ### 安装
 
-1. 打开本仓库的 **Releases** 页面，下载最新版本的 `better-zmeow-driver.user.js`。
-2. 在 Tampermonkey 中新建脚本，粘贴该文件内容；也可以直接把 `.user.js` 文件拖入浏览器，或打开该文件的 URL 让 Tampermonkey 接管安装。
-3. 确认安装。脚本需要 `GM_xmlhttpRequest` / `unsafeWindow` 权限；首次使用 Wooting 分享码时，Tampermonkey 可能询问是否允许访问 `api.wooting.io`，请按需允许。
-4. 打开 ZetsuMeow 网页驱动并像平常一样连接键盘。连接成功后，页面右下角会出现 **Better ZetsuMeow Driver** 面板。
+推荐从 npm CDN（jsDelivr）安装，自动更新也走同一地址；无法访问 jsDelivr 时再从 GitHub Releases 手动下载。
+
+1. 打开 `https://cdn.jsdelivr.net/npm/@bookqaq/better-zmeow-driver/better-zmeow-driver.user.js`，Tampermonkey 会接管安装。若无法访问 jsDelivr，改为打开本仓库的 **Releases** 页面下载最新版本的 `better-zmeow-driver.user.js`，再把文件拖入浏览器，或粘贴到 Tampermonkey 新建的脚本中。
+2. 确认安装。脚本需要 `GM_xmlhttpRequest` / `unsafeWindow` 权限；首次使用 Wooting 分享码时，Tampermonkey 可能询问是否允许访问 `api.wooting.io`，请按需允许。
+3. 打开 ZetsuMeow 网页驱动并像平常一样连接键盘。连接成功后，页面右下角会出现 **Better ZetsuMeow Driver** 面板。
 
 > Tampermonkey 的 MV3 版本请在扩展设置中开启 **Allow User Scripts**，并把 Content Script API 设为 **UserScripts API Dynamic**，否则可能无法在 `document-start` 注入脚本。
-
-> 国内网络也可从 npm 镜像直接安装：
-> `https://registry.npmmirror.com/@bookqaq/better-zmeow-driver/latest/files/better-zmeow-driver.user.js`
 
 > 发布版只匹配生产驱动域名 `https://driver.zetsumeow.com/`；`localhost` / `127.0.0.1` 仅用于本地调试构建。
 
 > 发布版面板不显示“连接键盘 / 连接屏幕 / 断开连接”按钮；设备的连接和断开由官方驱动页负责。开发构建才包含这些手动连接入口。
 
-### 使用
+### 使用z
 
 面板默认展开在右下角，主要操作如下：
 
@@ -63,7 +61,7 @@
 
 ## 更新
 
-发布版包含 `@downloadURL` / `@updateURL`，Tampermonkey 会定期通过 npm 镜像检查稳定更新通道（默认 npmmirror，方便国内访问），发现新版本时提示升级。也可以手动更新：
+发布版包含 `@downloadURL` / `@updateURL`，Tampermonkey 会定期通过 npm CDN 检查稳定更新通道（默认 jsDelivr），发现新版本时提示升级。也可以手动更新：
 
 1. 打开本仓库 **Releases** 页面，下载最新 `better-zmeow-driver.user.js`。
 2. 在 Tampermonkey 中打开已安装的脚本，用新文件内容替换，或直接重新安装该文件。
@@ -89,6 +87,7 @@
 
 - 动手前请（让你的大肥鱼）阅读 [AGENTS.md](AGENTS.md)，了解仓库结构、代码约定、测试方式和真机验证流程。
 - SDK、页面 Tap、Wooting 导入与协议细节见 [docs/SDK.md](docs/SDK.md)、[docs/TAP.md](docs/TAP.md)、[docs/WOOTING-IMPORT.md](docs/WOOTING-IMPORT.md)、[docs/PROTOCOL.md](docs/PROTOCOL.md)；发布流程见 [docs/RELEASE.md](docs/RELEASE.md)。
+- 用户手册站点（VitePress，Markdown → 静态网页）见 [apps/manual/README.md](apps/manual/README.md)，构建产物可独立部署到 Cloudflare Pages 或 nginx。
 - 本地开发：
 
   ```bash

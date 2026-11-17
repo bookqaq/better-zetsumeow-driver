@@ -1,0 +1,19 @@
+{
+  "name": "@bookqaq/zmeow-manual",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Better ZetsuMeow Driver user manual (VitePress static site)",
+  "license": "MIT",
+  "engines": {
+    "node": ">=22.18"
+  },
+  "scripts": {
+    "dev": "vitepress dev docs",
+    "build": "vitepress build docs",
+    "preview": "vitepress preview docs"
+  },
+  "devDependencies": {
+    "vitepress": "^1.6.4"
+  }
+}

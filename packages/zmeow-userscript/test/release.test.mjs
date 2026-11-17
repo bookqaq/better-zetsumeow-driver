@@ -267,11 +267,11 @@ test('--publish uploads npm and GitHub release assets', async () => {
     const publishedMeta = await readFile(path.join(publishOutdir, META_SCRIPT), 'utf8');
     assert.match(
       publishedMeta,
-      /^\/\/ @downloadURL\s+https:\/\/registry\.npmmirror\.com\/@bookqaq\/better-zmeow-driver\/latest\/files\/better-zmeow-driver\.user\.js$/m,
+      /^\/\/ @downloadURL\s+https:\/\/cdn\.jsdelivr\.net\/npm\/@bookqaq\/better-zmeow-driver\/better-zmeow-driver\.user\.js$/m,
     );
     assert.match(
       publishedMeta,
-      /^\/\/ @updateURL\s+https:\/\/registry\.npmmirror\.com\/@bookqaq\/better-zmeow-driver\/latest\/files\/better-zmeow-driver\.meta\.js$/m,
+      /^\/\/ @updateURL\s+https:\/\/cdn\.jsdelivr\.net\/npm\/@bookqaq\/better-zmeow-driver\/better-zmeow-driver\.meta\.js$/m,
     );
 
     const npmArgs = JSON.parse(await readFile(npmLog, 'utf8'));

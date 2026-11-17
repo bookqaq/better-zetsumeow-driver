@@ -231,7 +231,7 @@ pnpm -F @bookqaq/better-zmeow-driver build
 
 pnpm -F @bookqaq/better-zmeow-driver release
 # dist/release/better-zmeow-driver.user.js     面向用户的发布包
-# release 版 metadata 含 @downloadURL / @updateURL（默认 npmmirror）
+# release 版 metadata 含 @downloadURL / @updateURL（默认 jsDelivr）
 # 发布步骤见 RELEASE.md
 ```
 

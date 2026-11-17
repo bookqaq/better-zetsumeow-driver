@@ -127,7 +127,7 @@ pnpm -F @bookqaq/better-zmeow-driver release -- --publish
 The packager runs `pnpm check`, validates the release metadata and mode traces,
 injects `@downloadURL` / `@updateURL`, writes checksums and release notes, and
 (`--publish`) pushes a staged npm package plus a GitHub Release. Auto-update
-defaults to the npmmirror npm CDN; see [`docs/RELEASE.md`](../../docs/RELEASE.md)
+defaults to the jsDelivr npm CDN; see [`docs/RELEASE.md`](../../docs/RELEASE.md)
 for tokens, mirrors and rollback.
 
 ## Test
@@ -190,7 +190,7 @@ readable failures for missing and circular imports.
 - The release userscript matches only `driver.zetsumeow.com`; `localhost` and
   `127.0.0.1` are debug-only. Additional deployment origins must be added to
   `buildHeader()` before release.
-- Automatic updates default to
-  `https://registry.npmmirror.com/@bookqaq/better-zmeow-driver/latest/files`;
-  switch to jsDelivr/unpkg with `ZMEOW_UPDATE_BASE_URL` or
-  `--update-base-url` if needed.
+- Automatic updates use jsDelivr:
+  `https://cdn.jsdelivr.net/npm/@bookqaq/better-zmeow-driver`;
+  `ZMEOW_UPDATE_BASE_URL` / `--update-base-url` exist only for a self-hosted
+  static directory.

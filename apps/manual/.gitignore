@@ -1,0 +1,10 @@
+# Dependencies (pnpm links them from the workspace root)
+node_modules/
+
+# VitePress build output and local cache
+docs/.vitepress/dist/
+docs/.vitepress/cache/
+
+# Local deployment scratch files. The tracked nginx template stays visible.
+deploy/*
+!deploy/nginx.conf.example
