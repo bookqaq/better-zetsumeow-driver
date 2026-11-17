@@ -20,7 +20,6 @@ import {
   installTap,
   isUserCancelled,
   parseBackupText,
-  parseWootingProfileText,
   restoreBackup,
   setPageInputMuted,
   statusFingerprint,
@@ -501,46 +500,6 @@ async function boot(guard: TapGuard): Promise<void> {
             ),
           );
           console.error('[zmeow] wooting share import failed', error);
-        });
-    },
-    importWootingFile: (file) => {
-      // Same shape as loadRestore: read + validate the document before any
-      // device access, so a malformed file or an unsupported model is rejected
-      // (with the classified share-path error, never the safe view) before the
-      // protected transfer can start.
-      panel?.setTransferHint(t('busyFetchingWooting'));
-      void file
-        .text()
-        .then((text) => {
-          panel?.setTransferHint(null);
-          const { profile } = parseWootingProfileText(text);
-          const backup = wootingToBackup(profile, { layers: WOOTING_IMPORT_LAYERS });
-          log(
-            t('logWootingConverted', {
-              summary: formatConfigSummary(configSummary(backup.config)),
-            }),
-          );
-          logWootingConversionWarnings(backup.config);
-          if (!__ZMEOW_RELEASE__) {
-            downloadJson(backup.json, `wooting-import-${fileStamp()}.json`);
-            log(t('logWootingBackupDownloaded'));
-          }
-          runAction(t('actionWooting'), { protectedTransfer: true, reloadAfter: true }, (tap) =>
-            restoreWootingBackupWithConsent(tap, backup.json, backup.restoreOptions),
-          );
-        })
-        .catch((error: unknown) => {
-          panel?.setTransferHint(null);
-          state.error = describeError(error);
-          const kind = wootingImportErrorKind(error);
-          if (kind === 'schema') {
-            log(t('logWootingSchemaTooNew', { error: state.error }));
-          } else if (kind === 'model') {
-            log(t('logWootingModelUnsupported', { error: state.error }));
-          } else {
-            log(t('logLoadFailed', { name: file.name, error: state.error }));
-          }
-          console.error('[zmeow] load wooting file failed', error);
         });
     },
   };

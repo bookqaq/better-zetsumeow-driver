@@ -54,7 +54,6 @@ const zhCN = {
   actionBackup: '备份',
   actionRestore: '还原',
   actionWooting: '导入 Wooting 配置',
-  actionWootingFile: '从文件导入…',
   btnWootingImport: '导入',
   wootingCodePlaceholder: 'Wooting 分享码',
   btnDownload: '下载备份',
@@ -109,7 +108,7 @@ const zhCN = {
   logWootingRestored: 'Wooting 配置还原完成：重映射 {remap}、键色 {colors}、行程 {travel}',
   logWootingBackupDownloaded: '已开始下载转换后的备份 JSON（调试）',
   logWootingNetworkFailed:
-    '无法获取分享配置：{error}。可能是网络不通，或当前页面被浏览器 CORS 拦截（仅 wootility.io 页面可直连该接口）；可改用「从文件导入」。',
+    '无法获取分享配置：{error}。可能是网络不通，或当前页面被浏览器 CORS 拦截（仅 wootility.io 页面可直连该接口）；请检查网络后重试。',
   logWootingCodeInvalid: '分享码无效或配置不存在：{error}',
   logWootingModelUnsupported: '该 Wooting 型号不支持导入：{error}',
   logWootingSchemaTooNew: '该 Wooting 配置版本过新，请更新扩展后再导入：{error}',
@@ -199,7 +198,6 @@ const en: Record<MessageKey, string> = {
   actionBackup: 'Backup',
   actionRestore: 'Restore',
   actionWooting: 'Import Wooting profile',
-  actionWootingFile: 'Import from file…',
   btnWootingImport: 'Import',
   wootingCodePlaceholder: 'Wooting share code',
   btnDownload: 'Download',
@@ -249,7 +247,7 @@ const en: Record<MessageKey, string> = {
   logWootingRestored: 'Wooting profile restored: remap {remap}, colours {colors}, travel {travel}',
   logWootingBackupDownloaded: 'Converted backup JSON download started (debug)',
   logWootingNetworkFailed:
-    'Could not fetch the shared profile: {error}. The network may be down, or the browser blocked the request by CORS (only the wootility.io page can call the endpoint directly); use "Import from file" instead.',
+    'Could not fetch the shared profile: {error}. The network may be down, or the browser blocked the request by CORS (only the wootility.io page can call the endpoint directly); check the connection and try again.',
   logWootingCodeInvalid: 'Invalid share code or profile not found: {error}',
   logWootingModelUnsupported: 'This Wooting model is not supported for import: {error}',
   logWootingSchemaTooNew: 'This Wooting profile schema is newer than the extension supports; update the extension first: {error}',

@@ -234,8 +234,6 @@ test('wooting share fetch is built in (GM direct, no companion script)', () => {
     for (const marker of [
       'data-field="wooting-code"',
       'data-action="wooting"',
-      'data-action="wooting-file"',
-      'data-field="wooting-file"',
       // The share fetch is merged into the tap: it dispatches GM_xmlhttpRequest
       // directly with the pinned official origin, and falls back to plain
       // fetch when no manager provides the GM bindings.
@@ -245,6 +243,9 @@ test('wooting share fetch is built in (GM direct, no companion script)', () => {
     ]) {
       assert.ok(bundle.includes(marker), `bundle must contain ${marker}`);
     }
+    // Wooting import only accepts a share code; the file-import entry is gone.
+    assert.doesNotMatch(bundle, /wooting-file/, 'the Wooting file-import entry must be gone');
+    assert.doesNotMatch(bundle, /parseWootingProfileText/, 'the file-import parser must be gone');
     assert.match(
       bundle,
       /typeof GM_xmlhttpRequest !== 'undefined'/,

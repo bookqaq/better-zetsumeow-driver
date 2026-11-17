@@ -38,7 +38,6 @@ import {
   WOOTING_SHARE_ENDPOINT,
   WootingProfileVersionError,
   fetchWootingShare,
-  parseWootingShare,
   summarizeWootingProfile,
   wootingProfileToConfig,
   wootingRestoreOptions,
@@ -503,19 +502,6 @@ export async function fetchWootingProfile(code: string): Promise<WootingFetchRes
     code,
     gm === null ? undefined : { fetch: gmRequestToFetch(gm, code) },
   );
-  return { profile, summary: summarizeWootingProfile(profile) };
-}
-
-/**
- * Parse and summarize a Wooting profile document without touching a device.
- *
- * The "load file" half of the Wooting import flow calls this so a malformed
- * document or an unsupported model is rejected before the user can trigger a
- * device write — the same pre-flight the share-code path gets from
- * {@link fetchWootingProfile}.
- */
-export function parseWootingProfileText(text: string): WootingFetchResult {
-  const profile = parseWootingShare(text);
   return { profile, summary: summarizeWootingProfile(profile) };
 }
 

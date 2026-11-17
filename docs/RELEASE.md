@@ -280,8 +280,8 @@ curl -fsSL "https://github.com/bookqaq/zmeow-tools/releases/download/userscript-
 4. 验证 release 行为：Backup 一步下载 JSON；Restore 弹出选择 + 确认对话框，取消
    不写设备；连接按钮不可见。还原/导入成功后弹出「刷新页面」确认对话框：点击
    「立即刷新」才刷新，取消/关闭/Esc 不刷新。
-5. 验证设置页、语言切换/持久化、Wooting 分享码/文件导入入口仍然存在；Wooting
-   面板不再有层选择下拉框（固定基础层 + 第一层 Fn，layer 0/1）。
+5. 验证设置页、语言切换/持久化、Wooting 分享码导入入口仍然存在；Wooting 面板
+   不再有层选择下拉框（固定基础层 + 第一层 Fn，layer 0/1），也没有“从文件导入”。
 6. 安装上一个版本后触发 Tampermonkey“检查更新”，确认能升级到新版本。
 7. 如有条件，在 `https://driver.zetsumeow.com/*` 上做一次最小连接/读取验证；涉及
    写入或协议变更时按真机流程执行并记录。

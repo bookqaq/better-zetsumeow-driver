@@ -80,8 +80,6 @@ export interface PanelHandlers {
   restore(): void;
   /** Fetch and import a Wooting profile by its Wootility share code. */
   importWooting(code: string): void;
-  /** Import a Wooting profile from a picked file (fallback for CORS-blocked pages). */
-  importWootingFile(file: File): void;
 }
 
 /**
@@ -345,7 +343,6 @@ const STYLE = `
   .wooting-row {
     display: flex;
     gap: 5px;
-    margin-bottom: 9px;
   }
   .wooting-row input {
     flex: 1;
@@ -557,11 +554,7 @@ export function mountPanel(handlers: PanelHandlers, initial: PanelView): Panel {
               <input type="text" data-field="wooting-code" data-i18n-placeholder="wootingCodePlaceholder" placeholder="Wooting 分享码" />
               <button type="button" data-action="wooting" data-i18n="btnWootingImport">导入</button>
             </div>
-            <div class="actions">
-              <button type="button" data-action="wooting-file" class="secondary" data-i18n="actionWootingFile">从文件导入…</button>
-            </div>
           </div>
-          <input type="file" data-field="wooting-file" accept="application/json,text/plain,.json,.txt" hidden />
           <div class="log" data-field="log" role="log" aria-live="polite"></div>
         </div>
         <div data-view="settings" hidden>
@@ -605,7 +598,6 @@ export function mountPanel(handlers: PanelHandlers, initial: PanelView): Panel {
   // Same data-field name in both modes: outer input (debug) vs dialog input
   // (release); exactly one exists per template.
   const restoreFile = requireElement<HTMLInputElement>(shadow, '[data-field="restore-file"]');
-  const wootingFile = requireElement<HTMLInputElement>(shadow, '[data-field="wooting-file"]');
   const wootingCodeInput = requireElement<HTMLInputElement>(shadow, '[data-field="wooting-code"]');
   const restoreDialog = __ZMEOW_RELEASE__
     ? requireElement<HTMLDialogElement>(shadow, '[data-field="restore-dialog"]')
@@ -718,7 +710,6 @@ export function mountPanel(handlers: PanelHandlers, initial: PanelView): Panel {
 
   bindAction('backup', () => handlers.backup());
   bindAction('wooting', () => handlers.importWooting(wootingCodeInput.value));
-  bindAction('wooting-file', () => wootingFile.click());
   bindAction('tab-main', () => setView('main'));
   bindAction('tab-settings', () => setView('settings'));
   bindAction('collapse', () => setCollapsed(!panel.classList.contains('collapsed')));
@@ -790,7 +781,6 @@ export function mountPanel(handlers: PanelHandlers, initial: PanelView): Panel {
     });
   };
   pickFile(restoreFile, handlers.loadRestore);
-  pickFile(wootingFile, handlers.importWootingFile);
 
   // Enter in the share-code field triggers the same action as the Import
   // button (the dispatch respects the busy state; an empty code is reported

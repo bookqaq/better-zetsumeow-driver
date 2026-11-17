@@ -199,7 +199,7 @@ tap 只观察页面已经在发的帧；主动连接会在同一句柄上额外�
 
 - `src/sdk.ts` 与 `src/wooting/` 扩展模块 import SDK；
 - `src/main.ts` 只调用 `ZetsuTap.install()`、`tap.on('status'|'frame')`、`connectKeyboard()`、`connectScreen()`、`disconnect()`，以及 `sdk.ts` 的 JSON 备份/恢复封装与 Wooting 导入管线（抓取 → 解析 → 转备份格式 → 还原）；
-- `src/ui.ts` 只渲染 shadow DOM 面板，不碰 WebHID/WebSerial；面板包含连接、备份/下载（两步：Backup 入内存、Download 下载 JSON）、加载/还原（两步：Load restore file 校验入内存、Restore 写入设备）、导入 Wooting profile 按钮（分享码 / 文件两种入口）。还原/导入成功后面板弹出「刷新页面」确认对话框：点击「立即刷新」才执行 `location.reload()`，取消、关闭（×/Esc/点击遮罩）都不会刷新；
+- `src/ui.ts` 只渲染 shadow DOM 面板，不碰 WebHID/WebSerial；面板包含连接、备份/下载（两步：Backup 入内存、Download 下载 JSON）、加载/还原（两步：Load restore file 校验入内存、Restore 写入设备）、Wooting 分享码输入与导入按钮（仅分享码入口）。还原/导入成功后面板弹出「刷新页面」确认对话框：点击「立即刷新」才执行 `location.reload()`，取消、关闭（×/Esc/点击遮罩）都不会刷新；
 - 还原时若备份文件的 `layout` 与设备上报布局不一致，面板弹出「布局不一致」对话框（debug / release 两模式均有）：点击「同意还原」以 `allowLayoutMismatch: true` 继续写入，重叠按键生效、设备上不存在的按键按 hardCode 跳过并记入 warnings 日志；点击「取消」或按 Esc 则中止，不写入设备、不记错误、官方页安全视图原样返回。布局不匹配的还原也可以在 `sdk.ts` 的 `restoreBackup` 里传 `onLayoutMismatch` 钩子自定义询问逻辑；
 - 构建产物是单个 IIFE，包含 SDK，不需要额外 `@require`；
 - 脚本运行在 Tampermonkey 的**授权沙箱**（`@grant GM_xmlhttpRequest` / `GM.xmlHttpRequest` / `unsafeWindow` + `@sandbox JavaScript`）：GM 权限负责 Wootility 分享码取数（`@connect api.wooting.io`）；tap patch 通过 `unsafeWindow` 锚定到**宿主页面 realm**——`sdk.ts` 的 `resolvePageEnvironment()` 把页面 realm 的 `HIDDevice` / `SerialPort` / `navigator` 经 SDK `ZetsuTap.environment` 注入，`hid-tap` / `serial-tap` 把 patch 打在传入的原型上，沙箱自身 realm 的原型不受影响。没有 manager（测试、模拟器页面）时回退 `globalThis`，行为与主世界注入路径一致；`copyBytes` 用 `ArrayBuffer.isView` 做跨 realm 字节拷贝（页面 realm 的 TypedArray 不是沙箱 `instanceof Uint8Array`）。
@@ -210,8 +210,7 @@ SDK 本体不含 Wooting 代码，也不执行任何网络请求；Wootility pro
 
 **第一步：取数与解析（不碰设备）。**
 
-- 分享码路径：`sdk.ts` 的 `fetchWootingProfile(code)` 调扩展的 `fetchWootingShare`（GET Wootility 分享接口，固定 `origin: https://wootility.io`）。取数优先走 `GM_xmlhttpRequest`（脚本自带 grant，从扩展后台发出，不受页面 CORS 约束；兼容 `GM.xmlHttpRequest` Promise 变体），没有 manager 提供时回退页面 `fetch`（驱动页会被 CORS 拦截，此时可用文件导入代替）。拿到响应后立即 `summarizeWootingProfile` 摘要型号。分享接口限流约 40 次 / 10s（响应带 `x-ratelimit-*` 头）；HTTP 429 归为网络/限流失败。
-- 文件路径：`parseWootingProfileText(text)` 对 `.txt` / `.json` 分享响应做同样的解析 + 摘要，不触网。
+- 分享码路径：`sdk.ts` 的 `fetchWootingProfile(code)` 调扩展的 `fetchWootingShare`（GET Wootility 分享接口，固定 `origin: https://wootility.io`）。取数优先走 `GM_xmlhttpRequest`（脚本自带 grant，从扩展后台发出，不受页面 CORS 约束；兼容 `GM.xmlHttpRequest` Promise 变体），没有 manager 提供时回退页面 `fetch`（驱动页会被 CORS 拦截，此时导入会明确失败并提示网络/CORS）。拿到响应后立即 `summarizeWootingProfile` 摘要型号。分享接口限流约 40 次 / 10s（响应带 `x-ratelimit-*` 头）；HTTP 429 归为网络/限流失败。
 - **型号预检**：摘要只认 60HE 家族（`target.device` 4/5/9/11 → 原生布局 `compact65`）与 80HE 家族（10/12 → `extended79`）；Wooting One（0）、Wooting Two 系列（Two=1、Two HE=3/6）、UwU（7/8）、Lekker（2，开关模块）与未知 id 在这一步抛 `UnsupportedError`。错误文案明确写出 `Wooting One / Two series / UwU` **不支持，且不进行重叠键部分迁移**。预检发生在受保护传输开始之前——不支持的型号永远不会触发设备写入，也不会把驱动页切进安全视图。详细矩阵见 [WOOTING-IMPORT.md](WOOTING-IMPORT.md)。
 
 **第二步：转换与还原（走 SDK 还原路径）。**

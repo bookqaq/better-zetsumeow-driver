@@ -166,7 +166,8 @@ Notes on the counts:
   panel's display total; the simulator object keeps directional counters
   (`hidOut` / `hidIn` / `serialOut` / `serialIn`) separately.
 - `panelPresent` requires the host `#zmeow-tap-root`, its open shadow root, the
-  `.panel` element, and the keyboard/screen/disconnect/backup/restore/Wooting buttons.
+  `.panel` element, and the keyboard/screen/disconnect/backup/restore buttons
+  plus the Wooting share-code input.
 - `pageInputOk` is true only if the page's own `device.oninputreport` handler
   still received both the `cmd 1` info frame and the `cmd 2/19` fMode frame
   after the tap wrapped the prototype accessor.
