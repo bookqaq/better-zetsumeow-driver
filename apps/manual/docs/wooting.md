@@ -1,6 +1,6 @@
 # 导入 Wooting 配置
 
-脚本可以把 Wootility Web 的 profile 迁移到 Zetsu 键盘。导入通过 **Wooting 分享码** 取数，
+脚本可以把 Wootility Web 的 profile 迁移到 ZetsuMeow 键盘。导入通过 **Wooting 分享码** 取数，
 在本地转换成备份格式后，走与[还原配置](/restore)相同的写入流程。
 
 ::: warning 导入前先备份
@@ -41,6 +41,11 @@ Tampermonkey 的 `GM_xmlhttpRequest` 发出，因此不受驱动页 CORS 限制�
 
 1. 连接键盘，确认面板为 **已连接**。
 2. 在 **导入 Wooting 配置** 输入框粘贴分享码，点击 **导入**。
+
+![「导入 Wooting 配置」一栏，输入框已粘贴分享码，右侧为「导入」按钮](/screenshots/wooting-import-input.png)
+
+*图：「导入 Wooting 配置」一栏：输入分享码后点击「导入」。*
+
 3. 等待日志依次出现：
    - `已获取 Wooting 配置 …，开始写入`；
    - `Wooting 配置已转换为备份文档：…，开始还原`；
@@ -51,6 +56,10 @@ Tampermonkey 的 `GM_xmlhttpRequest` 发出，因此不受驱动页 CORS 限制�
    `Wooting 配置还原完成：重映射 …、键色 …、行程 …`。
 6. 检查 `警告：…` 行和“Wooting 配置转换提示”行，了解哪些项目没有被导入。
 7. 在“刷新页面”对话框中选择是否立即刷新。
+
+![Wooting 导入完成后的面板日志，含还原摘要与警告提示](/screenshots/wooting-import-done.png)
+
+*图：导入完成后的日志：还原摘要、转换警告与刷新提示。*
 
 ## 会导入什么
 

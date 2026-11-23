@@ -67,8 +67,16 @@ https://cdn.jsdelivr.net/npm/@bookqaq/better-zmeow-driver/better-zmeow-driver.us
 3. 连接成功后，即可正常使用。
 4. 若想调整面板语言，打开面板的 **设置** 页签，设置语言为简体中文或 English。
 
+![面板设置页签：语言下拉框（简体中文 / English）与提示文案](/screenshots/install-settings-language.png)
+
+*设置页签中的语言下拉框，可在简体中文与 English 之间切换。*
+
 打开面板的 **主面板** 页签，可以看到连接状态、页面指纹、帧数和 SDK 状态。
 各字段的含义见[界面说明](/panel)。
+
+![首次运行连接成功后的主面板：状态「已连接」，日志区为首次注入序列（SDK：ZetsuTap 可用、tap 已安装、未连接（等待设备）、指纹已刷新、已连接）](/screenshots/install-panel-first-run.png)
+
+*首次运行连接成功后的主面板，日志区记录了从未连接（等待设备）到已连接的首次注入序列。*
 
 ## 验证安装
 

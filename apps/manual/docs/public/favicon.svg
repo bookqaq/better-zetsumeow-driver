@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Better ZetsuMeow Driver">
-  <rect width="64" height="64" rx="14" fill="#0f172a"/>
-  <rect x="6" y="17" width="52" height="30" rx="7" fill="#0f766e"/>
-  <g fill="#ccfbf1">
+  <rect width="64" height="64" rx="14" fill="#0a0a0a"/>
+  <rect x="6" y="17" width="52" height="30" rx="7" fill="#ff4570"/>
+  <g fill="#ffffff">
     <rect x="11" y="22" width="7" height="6" rx="1.5"/>
     <rect x="20.5" y="22" width="7" height="6" rx="1.5"/>
     <rect x="30" y="22" width="7" height="6" rx="1.5"/>

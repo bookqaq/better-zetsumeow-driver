@@ -1,7 +1,7 @@
 # Wootility Web 配置导入
 
 本文记录 **Better ZetsuMeow Driver** 油猴脚本从 Wootility Web profile 导入到
-Zetsu 键盘时的字段口径、支持范围和限制。实现位于 `packages/zmeow-userscript/src/wooting/`。
+ZetsuMeow 键盘时的字段口径、支持范围和限制。实现位于 `packages/zmeow-userscript/src/wooting/`。
 
 ## 1. 数据流与 schema
 

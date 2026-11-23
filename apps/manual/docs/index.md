@@ -3,7 +3,7 @@ layout: home
 
 hero:
   name: Better ZetsuMeow Driver
-  text: 用户手册
+  text: 赋能次元
   tagline: 为 ZetsuMeow 网页驱动补上配置备份 / 还原功能，并提供 Wooting 配置导入。
   actions:
     - theme: brand
@@ -20,7 +20,7 @@ features:
   - title: 配置备份 / 还原
     details: 把重映射、灯效、单键颜色、行程、快速触发、高级键和杂项设置导出为 JSON；还原时逐项写入并回读校验，丢写自动重试一次。
   - title: Wooting profile 导入
-    details: 用分享码把 Wootility 的 60HE / 80HE 配置迁移到 Zetsu 键盘，固定导入基础层和第一层 Fn，不支持的功能会写入日志。
+    details: 用分享码把 Wootility 的 60HE / 80HE 配置迁移到 ZetsuMeow 键盘，固定导入基础层和第一层 Fn，不支持的功能会写入日志。
   - title: 不抢占设备
     details: 脚本观察官方驱动已经建立的 WebHID / Web Serial 连接，不修改官方驱动文件，也不接管官方页面的设备连接。
   - title: 写入保护
@@ -36,6 +36,10 @@ WebHID / Web Serial 连接，在驱动页右下角提供一个独立面板，用
 - 备份当前键盘配置，或把之前导出的配置写回设备；
 - 用 Wooting 分享码导入 60HE / 80HE 的 profile；
 - 查看连接状态、页面指纹、帧数与操作日志。
+
+![已连接状态的面板整体：绿色状态点、主面板页签、状态/指纹/帧数/SDK 信息区、备份/还原/Wooting 导入操作区与日志区](/screenshots/home-panel-overview.png)
+
+*图：驱动页右下角的面板（已连接状态）*
 
 脚本不修改官方驱动文件，也不替代官方驱动；键盘的连接、断开和日常设置仍由官方页面负责。
 

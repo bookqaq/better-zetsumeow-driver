@@ -12,9 +12,8 @@
 # 并把下面的 root / location 换成对应的 alias。详见 apps/manual/README.md。
 
 server {
-    listen 80;
-    listen [::]:80;
-    server_name manual.example.com;
+    listen 8443;
+    server_name better-zetsumeow-driver.bookq.xyz;
 
     root /var/www/zmeow-manual;
     index index.html;

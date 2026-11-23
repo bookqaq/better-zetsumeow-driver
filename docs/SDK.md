@@ -5,7 +5,7 @@ ZetsuMeow 磁轴键盘 SDK 的完整 API 参考。SDK 通过 **WebHID** 与键�
 - 入口：`@bookqaq/zmeow-sdk`（源码 `packages/zmeow-sdk/src/index.ts`，构建产物 `packages/zmeow-sdk/dist/index.js`）
 - 测试入口：`@bookqaq/zmeow-sdk/testing`（WebHID / Web Serial 假设备）
 - 运行时依赖：无；导入模块不会触碰 `navigator.hid` / `navigator.serial`
-- 范围：SDK 只覆盖 Zetsu 键盘本身的能力，**不含任何 Wooting 代码，也不执行任何网络 I/O**；Wooting profile 导入是驱动油猴脚本的扩展（`packages/zmeow-userscript/src/wooting/`），见 [TAP.md](TAP.md) §5
+- 范围：SDK 只覆盖 ZetsuMeow 键盘本身的能力，**不含任何 Wooting 代码，也不执行任何网络 I/O**；Wooting profile 导入是驱动油猴脚本的扩展（`packages/zmeow-userscript/src/wooting/`），见 [TAP.md](TAP.md) §5
 
 ```ts
 import {
